@@ -5,14 +5,10 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const chalk = require('chalk');
-// const { validator } = require('validator');
-const { celebrate, Joi, errors } = require('celebrate');
-const UserController = require('./controllers/Users.controller');
-// const { constants } = require('./utils/constants');
+const { errors } = require('celebrate');
 const { errorLogger, requestLogger } = require('./middlewares/logger');
-const auth = require('./middlewares/auth');
-const { NotFoundError } = require('./utils/Errors/NotFoundError');
 const { errorHandling } = require('./middlewares/errorHandling');
+const routes = require('./routes/index');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -33,29 +29,10 @@ app.use(requestLogger);
 
 app.use(cors());
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(6).max(30),
-  }),
-}), UserController.signIn);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(6).max(30),
-    name: Joi.string().required().min(2).max(30),
-  }),
-}), UserController.createUser);
-
-app.use('/movies', auth, require('./routes/movies.route'));
-app.use('/users', auth, require('./routes/users.route'));
+app.use('/', routes);
 
 app.use(errorLogger);
 app.use(errors());
-app.use((req, res, next) => {
-  next(new NotFoundError('Такой страницы не существует'));
-}); // Несуществующий путь
 app.use(errorHandling); // Централизованный обработчик
 
 app.listen(PORT, () => {

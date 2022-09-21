@@ -9,26 +9,24 @@ const constants = require('../utils/constants');
 class UserController {
   static createUser = (req, res, next) => {
     const { email, password, name } = req.body;
-    User.findOne({ email })
-      .then((user) => {
-        if (user) return next(new ConflictError('Такой пользователь уже зарегистрирован.'));
-        return bcrypt.hash(password, 10)
-          .then((hash) => User.create({
+
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        email,
+        password: hash,
+        name,
+      }))
+      .then((newUser) => {
+        res.status(201).send({
+          data: {
+            _id: newUser._id,
             email,
-            password: hash,
             name,
-          }))
-          .then((newUser) => {
-            res.status(201).send({
-              data: {
-                _id: newUser._id,
-                email,
-                name,
-              },
-            });
-          });
+          },
+        });
       })
       .catch((e) => {
+        if (e.code === 11000) return next(new ConflictError('Такой пользователь уже существует'));
         if (e.name === 'ValidationError') return next(new BadRequestError('Переданы некорректные данные'));
         return next(e);
       });
@@ -65,6 +63,7 @@ class UserController {
         res.send({ data: user });
       })
       .catch((e) => {
+        if (e.code === 11000) return next(new ConflictError('Такой пользователь уже существует.'));
         if (e.name === 'ValidationError') return next(new BadRequestError('Переданы некорректные данные.'));
         return next(e);
       });

@@ -47,9 +47,7 @@ class MoviesController {
       .catch((e) => {
         if (e.name === 'ValidationError') {
           return next(
-            new BadRequestError({
-              message: 'Переданы некорректные данные при создании записи о фильме.',
-            }),
+            new BadRequestError('Переданы некорректные данные при создании записи о фильме.'),
           );
         }
         return next(e);
@@ -60,10 +58,10 @@ class MoviesController {
     Movie.findById(req.params.movieId)
       .then((movie) => {
         if (!movie) return next(new NotFoundError('Фильм не найден'));
-        if (movie.owner._id.toString() !== req.user._id) return next(new ForbiddenError({ message: 'Вы не являетесь автором записи о фильме.' }));
-        return Movie.findByIdAndRemove(req.params.movieId)
+        if (movie.owner._id.toString() !== req.user._id) return next(new ForbiddenError('Вы не являетесь автором записи о фильме.'));
+        movie.remove()
           .then(() => {
-            res.send({ message: 'Фильм удалён из избранного' });
+            res.send({ data: movie });
           });
       })
       .catch((e) => {
