@@ -4,7 +4,9 @@
   "description": "Backend of \"Movies Explorer\"",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon ./src/app.js",
+    "start": "node ./src/app.js",
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,8 @@
   },
   "homepage": "https://github.com/klimetzc/movies-explorer-api#readme",
   "devDependencies": {
+    "@babel/core": "^7.18.13",
+    "@babel/eslint-parser": "^7.18.9",
     "eslint": "8.21.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
@@ -27,6 +31,7 @@
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
     "celebrate": "^15.0.1",
+    "chalk": "^4.1.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
